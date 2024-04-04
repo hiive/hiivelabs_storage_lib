@@ -7,3 +7,6 @@ edition = "2021"
 
 [dependencies]
 rusqlite = { version = "0.31.0", features = ["bundled"] }
+log = "0.4.21"
+miniz_oxide = "0.7.2"
+bitcode = { version = "0.6.0" }
