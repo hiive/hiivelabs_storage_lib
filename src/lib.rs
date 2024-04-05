@@ -1,3 +1,5 @@
+#![allow(dead_code)]
+
 pub(crate) mod storage;
 pub mod string_utils;
 
