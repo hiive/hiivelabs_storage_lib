@@ -76,7 +76,7 @@ fn set_up_test_db(
 ) -> (SqliteStorageContainer, HashMap<String, String>) {
     let db_name = "test.db";
     // ensure the db is deleted
-    let result = std::fs::remove_file(db_name);
+    let _result = std::fs::remove_file(db_name);
 
     // create the db
     let db = SqliteStorageContainer::new(db_name, mangle).unwrap();
@@ -95,14 +95,31 @@ fn set_up_test_db(
 }
 
 #[test]
-fn test_read_write() {
-    // setup_test_logger();
+fn test_read_write_del() {
+    setup_test_logger();
+
+    // layer 1 is 1280 * 1024 tiles.
+    // layer 2 is 2560 * 2048 tiles - chunks are 64 * 32
+    // layer 2 has 40 * 64 chunks = 2560 chunks
+    // layer 2: 2560 entities saved and loaded in 567.60525ms
+
+    let entry_count= 512; //2560_u16;
+
+    let size_in_gb = entry_count as f64 / (1024.0 * 1024.0 * 1024.0);
+    println!("{size_in_gb}");
+
 
     let mangle = true;
     let compress = true;
-    let (db, uuids_and_hashes) = set_up_test_db(500, mangle, compress);
-    // let _ = uuids_and_hashes.drain(..).map(|(u, h)| uuid_to_hash_map.insert(u, h));
+    let (db, uuids_and_hashes) = set_up_test_db(entry_count, mangle, compress);
 
+    // test package list
+    let package_list = db.get_packages().unwrap();
+    assert_eq!(package_list.len(), 1);
+    assert_eq!(package_list.get(0).unwrap(),
+               &SqliteStorageContainer::get_package_name_for_type::<TestVec>());
+
+    // test read/write
     let package_contents_result = db.get_package_contents::<TestVec>();
     match package_contents_result {
         Ok(package_contents) => {
@@ -110,19 +127,19 @@ fn test_read_write() {
             assert_eq!(package_contents.len(), uuids_and_hashes.len());
 
             let start = Instant::now(); // Start timing
-            for package_id in package_contents {
+            for package_id in &package_contents {
                 // check package is there
-                assert!(uuids_and_hashes.contains_key(&package_id));
-                let package_hash = uuids_and_hashes.get(&package_id).expect("Can't find Hash");
+                assert!(uuids_and_hashes.contains_key(package_id));
+                let package_hash = uuids_and_hashes.get(package_id).expect("Can't find Hash");
 
                 // println!("{package_id} -> {package_hash}");
 
                 // load package and compare hash
                 let data = db
-                    .load_data_from_package::<TestVec>(&package_id)
+                    .load_data_from_package::<TestVec>(package_id)
                     .expect("Can't load data");
 
-                let data_id = data.get_unique_id(mangle);
+                let data_id = &data.get_unique_id(mangle);
                 let data_hash = &data.get_hash();
 
                 assert_eq!(package_id, data_id);
@@ -131,7 +148,15 @@ fn test_read_write() {
 
             let duration = start.elapsed();
             // log::info!("Saved and Loaded in {duration:?}");
-            println!("Saved and Loaded in {duration:?}");
+            println!("{entry_count} entities saved and loaded in {duration:?}");
+
+            // check deletion
+            let id_to_delete = package_contents.get(package_contents.len() / 2).unwrap();
+
+            let _ = db.delete_data_from_package::<TestVec>(id_to_delete);
+            let package_contents = db.get_package_contents::<TestVec>().unwrap();
+            assert!(!package_contents.contains(id_to_delete));
+
         }
         Err(e) => {
             println!("{e}");

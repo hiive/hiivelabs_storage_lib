@@ -21,7 +21,7 @@ impl StorageContainer for SqliteStorageContainer {
         let table_name = SqliteStorageContainer::get_package_name_for_type::<T>();
         let package_unique_id = to_store.get_unique_id(self.mangle);
         log::info!(
-            "Writing [{}] to [{}.{}]",
+            "Writing [{}] to [{}]:[{}]",
             package_unique_id,
             self.db_file_path,
             table_name
@@ -79,7 +79,7 @@ impl StorageContainer for SqliteStorageContainer {
     ) -> Result<T, &str> {
         let table_name = SqliteStorageContainer::get_package_name_for_type::<T>();
         log::info!(
-            "Reading [{}] from [{}.{}]",
+            "Reading [{}] from [{}]:[{}]",
             package_unique_id,
             self.db_file_path,
             table_name
@@ -128,7 +128,7 @@ impl StorageContainer for SqliteStorageContainer {
     ) -> Result<(), &str> {
         let table_name = SqliteStorageContainer::get_package_name_for_type::<T>();
         log::info!(
-            "Deleting [{}] from [{}.{}]",
+            "Deleting [{}] from [{}]:[{}]",
             package_unique_id,
             self.db_file_path,
             table_name
@@ -160,7 +160,7 @@ impl StorageContainer for SqliteStorageContainer {
         &self,
     ) -> Result<Vec<String>, &str> {
         let table_name = SqliteStorageContainer::get_package_name_for_type::<T>();
-        log::info!("Listing from [{}.{}]", self.db_file_path, table_name);
+        log::info!("Listing from [{}]:[{}]", self.db_file_path, table_name);
         let conn = self.get_db_connection()?;
         let _ = self.ensure_table_exists(&conn, &table_name)?;
 
@@ -176,7 +176,7 @@ impl StorageContainer for SqliteStorageContainer {
 
         let conn = self.get_db_connection()?;
         let stmt_result = conn.prepare_cached(
-                "select tbl_name from sqlite_master where type = 'table' and name like '\\_%' escape '\\';"
+                "select tbl_name from sqlite_master where type = 'table' and name like '\\_\\_%' escape '\\';"
             );
 
         match stmt_result {
@@ -239,7 +239,7 @@ impl SqliteStorageContainer {
     pub(crate) fn get_package_name_for_type<T>() -> String {
         let t_name = type_name::<T>();
         let t_name = t_name.split("::").last().unwrap_or(t_name).to_string();
-        crate::string_utils::convert_str_to_underscore_case(&t_name)
+        crate::string_utils::convert_str_to_underscore_case(&format!("_{t_name}"))
     }
 
     fn get_all_field_values(&self, stmt: &mut CachedStatement) -> Result<Vec<String>, &str> {
