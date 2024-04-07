@@ -30,11 +30,11 @@ jobs:
         restore-keys: |
           ${{ runner.os }}-cargo-registry-        
 
-    - name: Build
+    - name: Build hiivelabs_storage_lib
       run: cargo build --verbose
       working-directory: ./workspace/hiivelabs_storage_lib
 
-    - name: Run tests
+    - name: Run tests on hiivelabs_storage_lib
       run: cargo test --verbose
       working-directory: ./workspace/hiivelabs_storage_lib
 
