@@ -58,7 +58,7 @@ impl StorageContainer for SqliteStorageContainer {
 
         // ensure the table exists
         let conn = self.get_db_connection()?;
-        let _ = self.ensure_table_exists(&conn, &table_name)?;
+        self.ensure_table_exists(&conn, &table_name)?;
 
         // save the data to the table
         let result = conn.execute(
@@ -95,7 +95,7 @@ impl StorageContainer for SqliteStorageContainer {
         );
 
         let conn = self.get_db_connection()?;
-        let _ = self.ensure_table_exists(&conn, &table_name)?;
+        self.ensure_table_exists(&conn, &table_name)?;
 
         let result = conn.query_row(
             &format!(
@@ -143,7 +143,7 @@ impl StorageContainer for SqliteStorageContainer {
             table_name
         );
         let conn = self.get_db_connection()?;
-        let _ = self.ensure_table_exists(&conn, &table_name)?;
+        self.ensure_table_exists(&conn, &table_name)?;
 
         // save the data to the table
         let result = conn.execute(
@@ -171,7 +171,7 @@ impl StorageContainer for SqliteStorageContainer {
         let table_name = SqliteStorageContainer::get_package_name_for_type::<T>();
         log::info!("Listing from [{}]:[{}]", self.db_file_path, table_name);
         let conn = self.get_db_connection()?;
-        let _ = self.ensure_table_exists(&conn, &table_name)?;
+        self.ensure_table_exists(&conn, &table_name)?;
 
         let stmt_result = conn.prepare_cached(&format!("SELECT unique_id FROM {table_name};",));
         match stmt_result {
