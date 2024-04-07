@@ -16,6 +16,8 @@ jobs:
 
     steps:
     - uses: actions/checkout@v4
+      with:
+        path: workspace/hiivelabs_storage_lib
 
     - name: Cache Cargo Registry
       uses: actions/cache@v4
@@ -30,6 +32,9 @@ jobs:
 
     - name: Build
       run: cargo build --verbose
+      working-directory: ./workspace/hiivelabs_storage_lib
 
     - name: Run tests
       run: cargo test --verbose
+      working-directory: ./workspace/hiivelabs_storage_lib
+
