@@ -29,7 +29,6 @@ impl StorageContainer for SqliteStorageContainer {
 
         // check compression flag and compress the data
         // if it makes it smaller.
-
         let (serialized_data, was_compressed) = {
             let mut was_compressed = compress;
             let mut encoded = bitcode::encode(&to_store);
@@ -40,11 +39,17 @@ impl StorageContainer for SqliteStorageContainer {
                 (encoded, was_compressed) = if encoded_size <= compressed_size {
                     // don't store the compressed version
                     // if it's not any smaller.
-                    log::warn!("Package entry [{package_unique_id}] not smaller if compressed (compressed: [{compressed_size}], encoded: [{encoded_size}]).");
+                    log::warn!(
+                        "Package entry [{package_unique_id}] not smaller if compressed \
+                        (compressed: [{compressed_size}], encoded: [{encoded_size}])."
+                    );
                     (encoded, false)
                 } else {
                     // compression made it smaller
-                    log::info!("Package entry [{package_unique_id}] compressed (compressed: [{compressed_size}], encoded: [{encoded_size}]).");
+                    log::info!(
+                        "Package entry [{package_unique_id}] compressed \
+                        (compressed: [{compressed_size}], encoded: [{encoded_size}])."
+                    );
                     (compressed, true)
                 }
             }
@@ -58,9 +63,9 @@ impl StorageContainer for SqliteStorageContainer {
         // save the data to the table
         let result = conn.execute(
             &format!(
-                r#"INSERT INTO {table_name} (unique_id, serialized_data, compressed)
-        VALUES(:package_unique_id, :serialized_data, :compressed) ON CONFLICT (unique_id)
-        DO UPDATE SET serialized_data = :serialized_data, compressed = :compressed"#
+                "INSERT INTO {table_name} (unique_id, serialized_data, compressed) \
+                VALUES(:package_unique_id, :serialized_data, :compressed) ON CONFLICT (unique_id) \
+                DO UPDATE SET serialized_data = :serialized_data, compressed = :compressed"
             ),
             named_params! {
                 ":package_unique_id": package_unique_id,
@@ -180,8 +185,9 @@ impl StorageContainer for SqliteStorageContainer {
 
         let conn = self.get_db_connection()?;
         let stmt_result = conn.prepare_cached(
-                "select tbl_name from sqlite_master where type = 'table' and name like '\\_\\_%' escape '\\';"
-            );
+            "select tbl_name from sqlite_master where type = 'table' \
+                     and name like '\\_\\_%' escape '\\';",
+        );
 
         match stmt_result {
             Ok(mut stmt) => self.get_all_field_values(&mut stmt),
@@ -194,14 +200,17 @@ impl SqliteStorageContainer {
     pub fn new(db_file_path: &str, mangle: bool) -> Result<Self, &str> {
         let db_path = Path::new(db_file_path);
         if let Some(db_directory) = db_path.parent() {
-            if fs::create_dir_all(db_directory).is_ok() {
-                let db_file_path = String::from_str(db_file_path).unwrap();
-                Ok(Self {
-                    db_file_path,
-                    mangle,
-                })
-            } else {
-                Err("Unable to find/create directory path.")
+            match fs::create_dir_all(db_directory) {
+                Ok(_) => {
+                    let db_file_path = String::from_str(db_file_path).unwrap();
+                    Ok(Self {
+                        db_file_path,
+                        mangle,
+                    })
+                }
+                Err(_) => {
+                    Err("Unable to find/create directory path.")
+                }
             }
         } else {
             Err("Invalid directory path")

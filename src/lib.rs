@@ -1,6 +1,6 @@
 #![allow(dead_code)]
 
-pub(crate) mod storage;
+pub mod storage;
 pub mod string_utils;
 
 pub mod prelude {

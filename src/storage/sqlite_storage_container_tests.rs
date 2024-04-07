@@ -103,11 +103,10 @@ fn test_read_write_del() {
     // layer 2 has 40 * 64 chunks = 2560 chunks
     // layer 2: 2560 entities saved and loaded in 567.60525ms
 
-    let entry_count= 512; //2560_u16;
+    let entry_count = 512; //2560_u16;
 
     let size_in_gb = entry_count as f64 / (1024.0 * 1024.0 * 1024.0);
     println!("{size_in_gb}");
-
 
     let mangle = true;
     let compress = true;
@@ -116,8 +115,10 @@ fn test_read_write_del() {
     // test package list
     let package_list = db.get_packages().unwrap();
     assert_eq!(package_list.len(), 1);
-    assert_eq!(package_list.get(0).unwrap(),
-               &SqliteStorageContainer::get_package_name_for_type::<TestVec>());
+    assert_eq!(
+        package_list.get(0).unwrap(),
+        &SqliteStorageContainer::get_package_name_for_type::<TestVec>()
+    );
 
     // test read/write
     let package_contents_result = db.get_package_contents::<TestVec>();
@@ -159,7 +160,6 @@ fn test_read_write_del() {
             assert!(!package_contents.contains(id_to_delete));
             assert_eq!(package_contents.len(), (entry_count - 1) as usize);
             log::info!("Updated package size: {}", entry_count - 1);
-
         }
         Err(e) => {
             println!("{e}");
