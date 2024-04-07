@@ -19,6 +19,10 @@ jobs:
       with:
         path: workspace/hiivelabs_storage_lib
 
+    - name: Generate Cargo.lock for hiivelabs_storage_lib
+      run: cargo generate-lockfile --verbose
+      working-directory: ./workspace/hiivelabs_storage_lib
+
     - name: Cache Cargo Registry
       uses: actions/cache@v4
       with:
@@ -26,9 +30,10 @@ jobs:
           ~/.cargo/registry
           ~/.cargo/git
           workspace/**/target
-        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.toml') }}
+        key: ${{ runner.os }}-cargo-registry-${{ hashFiles('**/Cargo.lock') }}
         restore-keys: |
-          ${{ runner.os }}-cargo-registry-        
+          ${{ runner.os }}-cargo-registry-
+        save-always: true
 
     - name: Build hiivelabs_storage_lib
       run: cargo build --verbose
