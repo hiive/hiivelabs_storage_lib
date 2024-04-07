@@ -125,6 +125,7 @@ fn test_read_write_del() {
         Ok(package_contents) => {
             // check length
             assert_eq!(package_contents.len(), uuids_and_hashes.len());
+            assert_eq!(package_contents.len(), entry_count as usize);
 
             let start = Instant::now(); // Start timing
             for package_id in &package_contents {
@@ -148,7 +149,7 @@ fn test_read_write_del() {
 
             let duration = start.elapsed();
             // log::info!("Saved and Loaded in {duration:?}");
-            println!("{entry_count} entities saved and loaded in {duration:?}");
+            log::info!("{entry_count} entities saved and loaded in {duration:?}");
 
             // check deletion
             let id_to_delete = package_contents.get(package_contents.len() / 2).unwrap();
@@ -156,6 +157,8 @@ fn test_read_write_del() {
             let _ = db.delete_data_from_package::<TestVec>(id_to_delete);
             let package_contents = db.get_package_contents::<TestVec>().unwrap();
             assert!(!package_contents.contains(id_to_delete));
+            assert_eq!(package_contents.len(), (entry_count - 1) as usize);
+            log::info!("Updated package size: {}", entry_count - 1);
 
         }
         Err(e) => {

@@ -29,22 +29,26 @@ impl StorageContainer for SqliteStorageContainer {
 
         // check compression flag and compress the data
         // if it makes it smaller.
-        let mut was_compressed = compress;
-        let serialized_data = {
+
+        let (serialized_data, was_compressed) = {
+            let mut was_compressed = compress;
             let mut encoded = bitcode::encode(&to_store);
             if compress {
                 let compressed = compress_to_vec(encoded.as_slice(), 6);
-                encoded = if encoded.len() <= compressed.len() {
+                let encoded_size = encoded.len();
+                let compressed_size = compressed.len();
+                (encoded, was_compressed) = if encoded_size <= compressed_size {
                     // don't store the compressed version
                     // if it's not any smaller.
-                    was_compressed = false;
-                    encoded
+                    log::warn!("Package entry [{package_unique_id}] not smaller if compressed (compressed: [{compressed_size}], encoded: [{encoded_size}]).");
+                    (encoded, false)
                 } else {
                     // compression made it smaller
-                    compressed
+                    log::info!("Package entry [{package_unique_id}] compressed (compressed: [{compressed_size}], encoded: [{encoded_size}]).");
+                    (compressed, true)
                 }
             }
-            encoded
+            (encoded, was_compressed)
         };
 
         // ensure the table exists
