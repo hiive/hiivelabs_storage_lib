@@ -74,12 +74,9 @@ impl StorageContainer for SqliteStorageContainer {
             },
         );
         match result {
-            Ok(_) => {}
-            Err(_) => {
-                return Err("Error storing data to package");
-            }
+            Ok(_) => { Ok(package_unique_id) }
+            Err(_) => { Err("Error storing data to package") }
         }
-        Ok(package_unique_id)
     }
 
     fn load_data_from_package<T: UniqueId + bitcode::Encode + for<'a> bitcode::Decode<'a>>(
@@ -157,12 +154,9 @@ impl StorageContainer for SqliteStorageContainer {
         );
 
         match result {
-            Ok(_) => {}
-            Err(_) => {
-                return Err("Error deleting data from package");
-            }
+            Ok(_) => { Ok(()) }
+            Err(_) => { Err("Error deleting data from package") }
         }
-        Ok(())
     }
 
     fn get_package_contents<T: UniqueId + bitcode::Encode + for<'a> bitcode::Decode<'a>>(
@@ -238,10 +232,9 @@ impl SqliteStorageContainer {
             + "serialized_data blob "
             + ");";
         let result = conn.execute(&cmd, ());
-        if result.is_ok() {
-            Ok(())
-        } else {
-            Err("Table creation error.")
+        match result {
+            Ok(_) => Ok(()),
+            Err(_) => Err("Table creation error"),
         }
     }
 
