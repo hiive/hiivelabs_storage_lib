@@ -74,8 +74,8 @@ impl StorageContainer for SqliteStorageContainer {
             },
         );
         match result {
-            Ok(_) => { Ok(package_unique_id) }
-            Err(_) => { Err("Error storing data to package") }
+            Ok(_) => Ok(package_unique_id),
+            Err(_) => Err("Error storing data to package"),
         }
     }
 
@@ -154,8 +154,8 @@ impl StorageContainer for SqliteStorageContainer {
         );
 
         match result {
-            Ok(_) => { Ok(()) }
-            Err(_) => { Err("Error deleting data from package") }
+            Ok(_) => Ok(()),
+            Err(_) => Err("Error deleting data from package"),
         }
     }
 
@@ -202,9 +202,7 @@ impl SqliteStorageContainer {
                         mangle,
                     })
                 }
-                Err(_) => {
-                    Err("Unable to find/create directory path.")
-                }
+                Err(_) => Err("Unable to find/create directory path."),
             }
         } else {
             Err("Invalid directory path")
