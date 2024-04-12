@@ -243,7 +243,7 @@ impl SqliteStorageContainer {
     pub(crate) fn get_package_name_for_type<T>() -> String {
         let t_name = type_name::<T>();
         let t_name = t_name.split("::").last().unwrap_or(t_name).to_string();
-        crate::string_utils::convert_str_to_underscore_case(&format!("_{t_name}"))
+        hiivelabs_rand_utils_lib::prelude::convert_str_to_underscore_case(&format!("_{t_name}"))
     }
 
     fn get_all_field_values(&self, stmt: &mut CachedStatement) -> Result<Vec<String>, &str> {

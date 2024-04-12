@@ -19,6 +19,13 @@ jobs:
       with:
         path: workspace/hiivelabs_storage_lib
 
+    - name: Check out hiivelabs_rand_utils_lib
+      uses: actions/checkout@v4
+      with:
+        repository: hiive/hiivelabs_rand_utils_lib
+        token: ${{ secrets.RUST_PAT }}
+        path: workspace/hiivelabs_rand_utils_lib
+
     - name: Generate Cargo.lock for hiivelabs_storage_lib
       run: cargo generate-lockfile --verbose
       working-directory: ./workspace/hiivelabs_storage_lib
