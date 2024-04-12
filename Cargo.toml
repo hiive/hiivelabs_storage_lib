@@ -6,6 +6,8 @@ edition = "2021"
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 
 [dependencies]
+hiivelabs_rand_utils_lib = { version = "0.1.0", path = "../hiivelabs_rand_utils_lib"}
+
 rusqlite = { version = "0.31.0", features = ["bundled"] }
 log = "0.4.21"
 miniz_oxide = "0.7.2"
@@ -15,5 +17,3 @@ uuid = { version = "1.8.0", features = ["v4"] }
 hex = "0.4.3"
 sha2 = "0.11.0-pre.3"
 env_logger = "0.11.3"
-
-hiivelabs_rand_utils_lib = { version = "0.1.0", path = "../hiivelabs_rand_utils_lib"}
