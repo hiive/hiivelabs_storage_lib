@@ -1,6 +1,7 @@
 use crate::prelude::{StorageContainer, UniqueId};
 use crate::storage::sqlite_storage_container_impl::SqliteStorageContainer;
 use bitcode::{Decode, Encode};
+use hiivelabs_rand_utils_lib::utils::test_utils::setup_test_logger;
 use rand::prelude::StdRng;
 use rand::{Rng, SeedableRng};
 use sha2::{Digest, Sha256};
@@ -8,23 +9,6 @@ use std::any::type_name;
 use std::collections::HashMap;
 use std::time::Instant;
 use uuid::Uuid;
-
-pub(crate) fn setup_test_logger() {
-    #[cfg(debug_assertions)]
-    {
-        let _ = env_logger::Builder::new()
-            .write_style(env_logger::WriteStyle::Always)
-            // Include all events in tests
-            .filter_level(log::LevelFilter::max())
-            // Ensure events are captured by `cargo test`
-            .is_test(true)
-            .format_target(false)
-            // Ignore errors initializing the logger if tests race to configure it
-            .try_init();
-
-        // println!("Logger initialized.")
-    }
-}
 
 #[test]
 fn test_package_name_for_type_camel_case() {
