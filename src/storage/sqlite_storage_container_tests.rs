@@ -3,7 +3,7 @@ use crate::storage::sqlite_storage_container_impl::SqliteStorageContainer;
 use bitcode::{Decode, Encode};
 use hiivelabs_rand_utils_lib::utils::test_utils::setup_test_logger;
 use rand::prelude::StdRng;
-use rand::{Rng, SeedableRng};
+use rand::{Rng, SeedableRng, TryRngCore};
 use sha2::{Digest, Sha256};
 use std::any::type_name;
 use std::collections::HashMap;
@@ -49,8 +49,8 @@ impl TestVec {
 }
 
 fn generate_random_vector(length: usize) -> Vec<u8> {
-    let mut rng = StdRng::from_rng(rand::thread_rng()).unwrap();
-    (0..length).map(|_| rng.gen()).collect()
+    let mut rng = StdRng::from_rng(rand::thread_rng());
+    (0..length).map(|_| rng.random()).collect()
 }
 
 fn set_up_test_db(
