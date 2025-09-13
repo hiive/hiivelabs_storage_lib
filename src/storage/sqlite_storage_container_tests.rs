@@ -49,7 +49,7 @@ impl TestVec {
 }
 
 fn generate_random_vector(length: usize) -> Vec<u8> {
-    let mut rng = StdRng::from_rng(rand::thread_rng());
+    let mut rng = StdRng::from_rng(&mut rand::rng());
     (0..length).map(|_| rng.random()).collect()
 }
 
