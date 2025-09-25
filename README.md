@@ -10,7 +10,6 @@ management for game development and data persistence needs.
 - **Unique ID Management**: UUID-based unique identifier system
 - **Data Compression**: Built-in compression support using miniz_oxide
 - **Binary Serialization**: Efficient data serialization with bitcode
-- **Cryptographic Hashing**: SHA-2 and hex encoding for data integrity
 - **Random Utilities Integration**: Leverages hiivelabs_rand_utils_lib for enhanced functionality
 
 ## Dependencies
